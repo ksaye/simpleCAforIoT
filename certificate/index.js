@@ -12,7 +12,7 @@ module.exports = async function (context, req) {
 
         var rootName = camelcase("RootAuthority");              // default name of our CA, unless given via a parameter
         if (req.query.rootName){
-            rootName = camelcase(req.query.rootName);
+            rootName = req.query.rootName;
         }
 
         if(!fs.existsSync(rootName + '-publicKey.pem') || !fs.existsSync(rootName + '-privateKey.pem')){     // no CA by that name, creating one.
@@ -21,7 +21,7 @@ module.exports = async function (context, req) {
         }
 
         if (req.query.action == "createCertificate" && req.query.cn){   // create a client cert and return the ZIP file of the private, public and Issuing Authority public key
-            var deviceId = camelcase(req.query.cn);
+            var deviceId = req.query.cn;
             if (req.query.iotedge){                                     // for Azure IoT Edge the Certificate must have the CA capability
                 execSync('openssl req -newkey rsa:2048 -days ' + certOptions.days + ' -nodes -keyout ' + deviceId + '-privateKey.pem -out ' + deviceId + '-request.pem -subj "/CN=' + deviceId + '"' + 
                 ' --addext basicConstraints=critical,CA:TRUE,pathlen:2 --addext keyUsage=keyCertSign,digitalSignature');
